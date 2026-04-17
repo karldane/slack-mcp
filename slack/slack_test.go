@@ -109,7 +109,7 @@ func TestEnforcerProfile_ReadTools(t *testing.T) {
 	tests := []struct {
 		name string
 		tool interface {
-			GetEnforcerProfile() framework.EnforcerProfile
+			GetEnforcerProfile() *framework.EnforcerProfile
 		}
 		expectedRisk     framework.RiskLevel
 		expectedImpact   framework.ImpactScope
@@ -175,7 +175,7 @@ func TestEnforcerProfile_WriteTools(t *testing.T) {
 	tests := []struct {
 		name string
 		tool interface {
-			GetEnforcerProfile() framework.EnforcerProfile
+			GetEnforcerProfile() *framework.EnforcerProfile
 		}
 		expectedRisk     framework.RiskLevel
 		expectedImpact   framework.ImpactScope
@@ -234,7 +234,7 @@ func TestEnforcerProfile_HighRiskTools(t *testing.T) {
 	highRiskTools := []struct {
 		name string
 		tool interface {
-			GetEnforcerProfile() framework.EnforcerProfile
+			GetEnforcerProfile() *framework.EnforcerProfile
 		}
 	}{
 		{"CreateChannelTool", &CreateChannelTool{}},

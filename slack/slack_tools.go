@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/karldane/mcp-framework/framework"
+	"github.com/mark3labs/mcp-go/mcp"
 )
 
 // ============================================================================
@@ -20,18 +20,18 @@ func (t *ListChannelsTool) Description() string {
 	return "List all accessible Slack channels in the workspace."
 }
 func (t *ListChannelsTool) Schema() mcp.ToolInputSchema { return listChannelsSchema() }
-func (t *ListChannelsTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *ListChannelsTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	types := getString(args, "types", "public_channel,private_channel")
 	excludeArchived := getBool(args, "exclude_archived", true)
 	limit := getInt(args, "limit", 100)
 	channels, _, err := t.client.ListChannels(ctx, types, excludeArchived, limit)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(channels)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *ListChannelsTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *ListChannelsTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -48,16 +48,16 @@ func (t *GetChannelInfoTool) Description() string {
 	return "Get detailed information about a specific Slack channel."
 }
 func (t *GetChannelInfoTool) Schema() mcp.ToolInputSchema { return getChannelInfoSchema() }
-func (t *GetChannelInfoTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *GetChannelInfoTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	ch, err := t.client.GetChannelInfo(ctx, channelID)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(ch)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *GetChannelInfoTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *GetChannelInfoTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -72,17 +72,17 @@ type CreateChannelTool struct{ client *Client }
 func (t *CreateChannelTool) Name() string                { return "create_channel" }
 func (t *CreateChannelTool) Description() string         { return "Create a new Slack channel." }
 func (t *CreateChannelTool) Schema() mcp.ToolInputSchema { return createChannelSchema() }
-func (t *CreateChannelTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *CreateChannelTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	name := getRequiredString(args, "name")
 	isPrivate := getBool(args, "is_private", false)
 	ch, err := t.client.CreateChannel(ctx, name, isPrivate)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(ch)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *CreateChannelTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *CreateChannelTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskHigh),
 		framework.WithImpact(framework.ImpactWrite),
@@ -98,14 +98,14 @@ type ArchiveChannelTool struct{ client *Client }
 func (t *ArchiveChannelTool) Name() string                { return "archive_channel" }
 func (t *ArchiveChannelTool) Description() string         { return "Archive a Slack channel." }
 func (t *ArchiveChannelTool) Schema() mcp.ToolInputSchema { return archiveChannelSchema() }
-func (t *ArchiveChannelTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *ArchiveChannelTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	if err := t.client.ArchiveChannel(ctx, channelID); err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
-	return fmt.Sprintf(`{"ok": true, "channel_id": %q}`, channelID), nil
+	return framework.TextResult(fmt.Sprintf(`{"ok": true, "channel_id": %q}`, channelID)), nil
 }
-func (t *ArchiveChannelTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *ArchiveChannelTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskHigh),
 		framework.WithImpact(framework.ImpactDelete),
@@ -123,19 +123,19 @@ func (t *GetChannelHistoryTool) Description() string {
 	return "Fetch message history from a Slack channel."
 }
 func (t *GetChannelHistoryTool) Schema() mcp.ToolInputSchema { return getChannelHistorySchema() }
-func (t *GetChannelHistoryTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *GetChannelHistoryTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	limit := getInt(args, "limit", 20)
 	oldest := getString(args, "oldest", "")
 	latest := getString(args, "latest", "")
 	history, err := t.client.GetChannelHistory(ctx, channelID, limit, oldest, latest)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(history)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *GetChannelHistoryTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *GetChannelHistoryTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -150,16 +150,16 @@ type JoinChannelTool struct{ client *Client }
 func (t *JoinChannelTool) Name() string                { return "join_channel" }
 func (t *JoinChannelTool) Description() string         { return "Join a Slack channel." }
 func (t *JoinChannelTool) Schema() mcp.ToolInputSchema { return joinChannelSchema() }
-func (t *JoinChannelTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *JoinChannelTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	ch, _, err := t.client.JoinChannel(ctx, channelID)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(ch)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *JoinChannelTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *JoinChannelTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskMed),
 		framework.WithImpact(framework.ImpactWrite),
@@ -174,15 +174,15 @@ type LeaveChannelTool struct{ client *Client }
 func (t *LeaveChannelTool) Name() string                { return "leave_channel" }
 func (t *LeaveChannelTool) Description() string         { return "Leave a Slack channel." }
 func (t *LeaveChannelTool) Schema() mcp.ToolInputSchema { return leaveChannelSchema() }
-func (t *LeaveChannelTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *LeaveChannelTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	ok, err := t.client.LeaveChannel(ctx, channelID)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
-	return fmt.Sprintf(`{"ok": true, "left": %v}`, ok), nil
+	return framework.TextResult(fmt.Sprintf(`{"ok": true, "left": %v}`, ok)), nil
 }
-func (t *LeaveChannelTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *LeaveChannelTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskMed),
 		framework.WithImpact(framework.ImpactWrite),
@@ -197,17 +197,17 @@ type SetChannelTopicTool struct{ client *Client }
 func (t *SetChannelTopicTool) Name() string                { return "set_channel_topic" }
 func (t *SetChannelTopicTool) Description() string         { return "Set the topic for a Slack channel." }
 func (t *SetChannelTopicTool) Schema() mcp.ToolInputSchema { return setChannelTopicSchema() }
-func (t *SetChannelTopicTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *SetChannelTopicTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	topic := getRequiredString(args, "topic")
 	ch, err := t.client.SetChannelTopic(ctx, channelID, topic)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(ch)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *SetChannelTopicTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *SetChannelTopicTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskMed),
 		framework.WithImpact(framework.ImpactWrite),
@@ -226,7 +226,7 @@ type PostMessageTool struct{ client *Client }
 func (t *PostMessageTool) Name() string                { return "post_message" }
 func (t *PostMessageTool) Description() string         { return "Post a message to a Slack channel." }
 func (t *PostMessageTool) Schema() mcp.ToolInputSchema { return postMessageSchema() }
-func (t *PostMessageTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *PostMessageTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	text := getRequiredString(args, "text")
 	threadTS := getString(args, "thread_ts", "")
@@ -234,11 +234,11 @@ func (t *PostMessageTool) Handle(ctx context.Context, args map[string]interface{
 	unfurlMedia := getBool(args, "unfurl_media", true)
 	chanID, ts, err := t.client.PostMessage(ctx, channelID, text, threadTS, unfurlLinks, unfurlMedia, false)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
-	return fmt.Sprintf(`{"ok": true, "channel": %q, "ts": %q}`, chanID, ts), nil
+	return framework.TextResult(fmt.Sprintf(`{"ok": true, "channel": %q, "ts": %q}`, chanID, ts)), nil
 }
-func (t *PostMessageTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *PostMessageTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskMed),
 		framework.WithImpact(framework.ImpactWrite),
@@ -253,18 +253,18 @@ type ReplyToThreadTool struct{ client *Client }
 func (t *ReplyToThreadTool) Name() string                { return "reply_to_thread" }
 func (t *ReplyToThreadTool) Description() string         { return "Reply to a message thread in Slack." }
 func (t *ReplyToThreadTool) Schema() mcp.ToolInputSchema { return replyToThreadSchema() }
-func (t *ReplyToThreadTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *ReplyToThreadTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	threadTS := getRequiredString(args, "thread_ts")
 	text := getRequiredString(args, "text")
 	broadcast := getBool(args, "broadcast", false)
 	chanID, ts, err := t.client.PostMessage(ctx, channelID, text, threadTS, false, false, broadcast)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
-	return fmt.Sprintf(`{"ok": true, "channel": %q, "ts": %q}`, chanID, ts), nil
+	return framework.TextResult(fmt.Sprintf(`{"ok": true, "channel": %q, "ts": %q}`, chanID, ts)), nil
 }
-func (t *ReplyToThreadTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *ReplyToThreadTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskMed),
 		framework.WithImpact(framework.ImpactWrite),
@@ -279,18 +279,18 @@ type GetThreadRepliesTool struct{ client *Client }
 func (t *GetThreadRepliesTool) Name() string                { return "get_thread_replies" }
 func (t *GetThreadRepliesTool) Description() string         { return "Get all replies in a message thread." }
 func (t *GetThreadRepliesTool) Schema() mcp.ToolInputSchema { return getThreadRepliesSchema() }
-func (t *GetThreadRepliesTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *GetThreadRepliesTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	threadTS := getRequiredString(args, "thread_ts")
 	limit := getInt(args, "limit", 20)
 	msgs, _, _, err := t.client.GetThreadReplies(ctx, channelID, threadTS, limit)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(msgs)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *GetThreadRepliesTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *GetThreadRepliesTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -305,19 +305,19 @@ type AddReactionTool struct{ client *Client }
 func (t *AddReactionTool) Name() string                { return "add_reaction" }
 func (t *AddReactionTool) Description() string         { return "Add an emoji reaction to a message." }
 func (t *AddReactionTool) Schema() mcp.ToolInputSchema { return addReactionSchema() }
-func (t *AddReactionTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *AddReactionTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	timestamp := getRequiredString(args, "timestamp")
 	emoji := getRequiredString(args, "emoji")
 	if err := t.client.AddReaction(ctx, channelID, timestamp, emoji); err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
-	return fmt.Sprintf(`{"ok": true}`), nil
+	return framework.TextResult(fmt.Sprintf(`{"ok": true}`)), nil
 }
-func (t *AddReactionTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *AddReactionTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
-		framework.WithImpact(framework.ImpactWrite),
+		framework.WithImpact(framework.ImpactRead),
 		framework.WithResourceCost(2),
 		framework.WithPII(false),
 		framework.WithIdempotent(true),
@@ -329,19 +329,19 @@ type RemoveReactionTool struct{ client *Client }
 func (t *RemoveReactionTool) Name() string                { return "remove_reaction" }
 func (t *RemoveReactionTool) Description() string         { return "Remove an emoji reaction from a message." }
 func (t *RemoveReactionTool) Schema() mcp.ToolInputSchema { return removeReactionSchema() }
-func (t *RemoveReactionTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *RemoveReactionTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	timestamp := getRequiredString(args, "timestamp")
 	emoji := getRequiredString(args, "emoji")
 	if err := t.client.RemoveReaction(ctx, channelID, timestamp, emoji); err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
-	return fmt.Sprintf(`{"ok": true}`), nil
+	return framework.TextResult(fmt.Sprintf(`{"ok": true}`)), nil
 }
-func (t *RemoveReactionTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *RemoveReactionTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
-		framework.WithImpact(framework.ImpactWrite),
+		framework.WithImpact(framework.ImpactRead),
 		framework.WithResourceCost(2),
 		framework.WithPII(false),
 		framework.WithIdempotent(false),
@@ -355,17 +355,17 @@ func (t *GetMessageReactionsTool) Description() string {
 	return "Get all reactions on a specific message."
 }
 func (t *GetMessageReactionsTool) Schema() mcp.ToolInputSchema { return getMessageReactionsSchema() }
-func (t *GetMessageReactionsTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *GetMessageReactionsTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	timestamp := getRequiredString(args, "timestamp")
 	reactions, err := t.client.GetReactions(ctx, channelID, timestamp, true)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(reactions)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *GetMessageReactionsTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *GetMessageReactionsTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -380,17 +380,17 @@ type UpdateMessageTool struct{ client *Client }
 func (t *UpdateMessageTool) Name() string                { return "update_message" }
 func (t *UpdateMessageTool) Description() string         { return "Update an existing message." }
 func (t *UpdateMessageTool) Schema() mcp.ToolInputSchema { return updateMessageSchema() }
-func (t *UpdateMessageTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *UpdateMessageTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	timestamp := getRequiredString(args, "timestamp")
 	text := getRequiredString(args, "text")
 	_, ts, _, err := t.client.UpdateMessage(ctx, channelID, timestamp, text)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
-	return fmt.Sprintf(`{"ok": true, "ts": %q}`, ts), nil
+	return framework.TextResult(fmt.Sprintf(`{"ok": true, "ts": %q}`, ts)), nil
 }
-func (t *UpdateMessageTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *UpdateMessageTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskMed),
 		framework.WithImpact(framework.ImpactWrite),
@@ -405,16 +405,16 @@ type DeleteMessageTool struct{ client *Client }
 func (t *DeleteMessageTool) Name() string                { return "delete_message" }
 func (t *DeleteMessageTool) Description() string         { return "Delete a message from a channel." }
 func (t *DeleteMessageTool) Schema() mcp.ToolInputSchema { return deleteMessageSchema() }
-func (t *DeleteMessageTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *DeleteMessageTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	timestamp := getRequiredString(args, "timestamp")
 	_, _, err := t.client.DeleteMessage(ctx, channelID, timestamp)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
-	return fmt.Sprintf(`{"ok": true}`), nil
+	return framework.TextResult(fmt.Sprintf(`{"ok": true}`)), nil
 }
-func (t *DeleteMessageTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *DeleteMessageTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskHigh),
 		framework.WithImpact(framework.ImpactDelete),
@@ -430,20 +430,20 @@ type SendDMTool struct{ client *Client }
 func (t *SendDMTool) Name() string                { return "send_dm" }
 func (t *SendDMTool) Description() string         { return "Send a direct message to a user." }
 func (t *SendDMTool) Schema() mcp.ToolInputSchema { return sendDMSchema() }
-func (t *SendDMTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *SendDMTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	userID := getRequiredString(args, "user_id")
 	text := getRequiredString(args, "text")
 	ch, _, _, err := t.client.OpenDM(ctx, []string{userID})
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	chanID, ts, err := t.client.PostMessage(ctx, ch.ID, text, "", false, false, false)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
-	return fmt.Sprintf(`{"ok": true, "channel": %q, "ts": %q}`, chanID, ts), nil
+	return framework.TextResult(fmt.Sprintf(`{"ok": true, "channel": %q, "ts": %q}`, chanID, ts)), nil
 }
-func (t *SendDMTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *SendDMTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskMed),
 		framework.WithImpact(framework.ImpactWrite),
@@ -460,17 +460,17 @@ func (t *ListConversationsTool) Description() string {
 	return "List direct message and group DM conversations."
 }
 func (t *ListConversationsTool) Schema() mcp.ToolInputSchema { return listConversationsSchema() }
-func (t *ListConversationsTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *ListConversationsTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	types := getString(args, "types", "im,mpim")
 	limit := getInt(args, "limit", 50)
 	chans, _, err := t.client.ListConversations(ctx, types, limit)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(chans)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *ListConversationsTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *ListConversationsTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -487,19 +487,19 @@ func (t *GetDMHistoryTool) Description() string {
 	return "Fetch message history from a DM or group DM conversation."
 }
 func (t *GetDMHistoryTool) Schema() mcp.ToolInputSchema { return getDMHistorySchema() }
-func (t *GetDMHistoryTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *GetDMHistoryTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	limit := getInt(args, "limit", 20)
 	oldest := getString(args, "oldest", "")
 	latest := getString(args, "latest", "")
 	history, err := t.client.GetDMHistory(ctx, channelID, limit, oldest, latest)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(history)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *GetDMHistoryTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *GetDMHistoryTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -514,19 +514,19 @@ type OpenDMTool struct{ client *Client }
 func (t *OpenDMTool) Name() string                { return "open_dm" }
 func (t *OpenDMTool) Description() string         { return "Open a direct message or group DM conversation." }
 func (t *OpenDMTool) Schema() mcp.ToolInputSchema { return openDMSchema() }
-func (t *OpenDMTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *OpenDMTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	userIDsStr := getRequiredString(args, "user_ids")
 	ch, _, _, err := t.client.OpenDM(ctx, []string{userIDsStr})
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(ch)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *OpenDMTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *OpenDMTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
-		framework.WithImpact(framework.ImpactWrite),
+		framework.WithImpact(framework.ImpactRead),
 		framework.WithResourceCost(2),
 		framework.WithPII(false),
 		framework.WithIdempotent(true),
@@ -544,19 +544,19 @@ func (t *SearchMessagesTool) Description() string {
 	return "Search messages across the Slack workspace."
 }
 func (t *SearchMessagesTool) Schema() mcp.ToolInputSchema { return searchMessagesSchema() }
-func (t *SearchMessagesTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *SearchMessagesTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	query := getRequiredString(args, "query")
 	sort := getString(args, "sort", "timestamp")
 	sortDir := getString(args, "sort_dir", "desc")
 	count := getInt(args, "count", 20)
 	results, err := t.client.SearchMessages(ctx, query, sort, sortDir, count)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(results)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *SearchMessagesTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *SearchMessagesTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -571,19 +571,19 @@ type SearchFilesTool struct{ client *Client }
 func (t *SearchFilesTool) Name() string                { return "search_files" }
 func (t *SearchFilesTool) Description() string         { return "Search files across the Slack workspace." }
 func (t *SearchFilesTool) Schema() mcp.ToolInputSchema { return searchFilesSchema() }
-func (t *SearchFilesTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *SearchFilesTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	query := getRequiredString(args, "query")
 	sort := getString(args, "sort", "timestamp")
 	sortDir := getString(args, "sort_dir", "desc")
 	count := getInt(args, "count", 20)
 	results, err := t.client.SearchFiles(ctx, query, sort, sortDir, count)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(results)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *SearchFilesTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *SearchFilesTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -600,20 +600,20 @@ func (t *SearchAllTool) Description() string {
 	return "Search both messages and files across the Slack workspace."
 }
 func (t *SearchAllTool) Schema() mcp.ToolInputSchema { return searchAllSchema() }
-func (t *SearchAllTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *SearchAllTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	query := getRequiredString(args, "query")
 	sort := getString(args, "sort", "timestamp")
 	sortDir := getString(args, "sort_dir", "desc")
 	count := getInt(args, "count", 10)
 	msgs, files, err := t.client.SearchAll(ctx, query, sort, sortDir, count)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	result := map[string]interface{}{"messages": msgs, "files": files}
 	b, _ := json.Marshal(result)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *SearchAllTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *SearchAllTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -632,17 +632,17 @@ type ListUsersTool struct{ client *Client }
 func (t *ListUsersTool) Name() string                { return "list_users" }
 func (t *ListUsersTool) Description() string         { return "List all users in the Slack workspace." }
 func (t *ListUsersTool) Schema() mcp.ToolInputSchema { return listUsersSchema() }
-func (t *ListUsersTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *ListUsersTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	limit := getInt(args, "limit", 100)
 	includeLocale := getBool(args, "include_locale", false)
 	users, err := t.client.ListUsers(ctx, limit, includeLocale)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(users)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *ListUsersTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *ListUsersTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -659,16 +659,16 @@ func (t *GetUserInfoTool) Description() string {
 	return "Get detailed information about a specific user."
 }
 func (t *GetUserInfoTool) Schema() mcp.ToolInputSchema { return getUserInfoSchema() }
-func (t *GetUserInfoTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *GetUserInfoTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	userID := getRequiredString(args, "user_id")
 	user, err := t.client.GetUserInfo(ctx, userID)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(user)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *GetUserInfoTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *GetUserInfoTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -685,16 +685,16 @@ func (t *GetUserPresenceTool) Description() string {
 	return "Get the presence/online status of a user."
 }
 func (t *GetUserPresenceTool) Schema() mcp.ToolInputSchema { return getUserPresenceSchema() }
-func (t *GetUserPresenceTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *GetUserPresenceTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	userID := getRequiredString(args, "user_id")
 	presence, err := t.client.GetUserPresence(ctx, userID)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(presence)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *GetUserPresenceTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *GetUserPresenceTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -709,16 +709,16 @@ type LookupUserByEmailTool struct{ client *Client }
 func (t *LookupUserByEmailTool) Name() string                { return "lookup_user_by_email" }
 func (t *LookupUserByEmailTool) Description() string         { return "Find a user by their email address." }
 func (t *LookupUserByEmailTool) Schema() mcp.ToolInputSchema { return lookupUserByEmailSchema() }
-func (t *LookupUserByEmailTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *LookupUserByEmailTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	email := getRequiredString(args, "email")
 	user, err := t.client.LookupUserByEmail(ctx, email)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(user)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *LookupUserByEmailTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *LookupUserByEmailTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -733,16 +733,16 @@ type GetUserProfileTool struct{ client *Client }
 func (t *GetUserProfileTool) Name() string                { return "get_user_profile" }
 func (t *GetUserProfileTool) Description() string         { return "Get the profile information for a user." }
 func (t *GetUserProfileTool) Schema() mcp.ToolInputSchema { return getUserProfileSchema() }
-func (t *GetUserProfileTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *GetUserProfileTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	userID := getRequiredString(args, "user_id")
 	profile, err := t.client.GetUserProfile(ctx, userID)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(profile)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *GetUserProfileTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *GetUserProfileTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -759,15 +759,15 @@ func (t *GetBotInfoTool) Description() string {
 	return "Get information about the authenticated bot user."
 }
 func (t *GetBotInfoTool) Schema() mcp.ToolInputSchema { return getBotInfoSchema() }
-func (t *GetBotInfoTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *GetBotInfoTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	info, err := t.client.GetBotInfo(ctx)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(info)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *GetBotInfoTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *GetBotInfoTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
@@ -784,15 +784,15 @@ func (t *GetTeamInfoTool) Description() string {
 	return "Get information about the Slack workspace/team."
 }
 func (t *GetTeamInfoTool) Schema() mcp.ToolInputSchema { return getTeamInfoSchema() }
-func (t *GetTeamInfoTool) Handle(ctx context.Context, args map[string]interface{}) (string, error) {
+func (t *GetTeamInfoTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
 	info, err := t.client.GetTeamInfo(ctx)
 	if err != nil {
-		return "", err
+		return framework.TextResult(""), err
 	}
 	b, _ := json.Marshal(info)
-	return string(b), nil
+	return framework.TextResult(string(b)), nil
 }
-func (t *GetTeamInfoTool) GetEnforcerProfile() framework.EnforcerProfile {
+func (t *GetTeamInfoTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	return framework.NewEnforcerProfile(
 		framework.WithRisk(framework.RiskLow),
 		framework.WithImpact(framework.ImpactRead),
