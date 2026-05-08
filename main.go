@@ -5,12 +5,19 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/karldane/mcp-framework/framework"
 	"github.com/karldane/slack-mcp/slack"
 )
 
 func main() {
 	writeEnabled := flag.Bool("write-enabled", false, "Enable write tools")
 	flag.Parse()
+
+	server := slack.NewServer()
+
+	if framework.HandleScanFlag(server) {
+		return
+	}
 
 	botToken := os.Getenv("SLACK_BOT_TOKEN")
 	if botToken == "" {
@@ -23,7 +30,6 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Note: SLACK_USER_TOKEN not set - search tools will not be registered")
 	}
 
-	server := slack.NewServer()
 	server.SetWriteEnabled(*writeEnabled)
 	server.Initialize()
 	server.Start()

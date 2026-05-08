@@ -13,7 +13,10 @@ import (
 // CHANNEL TOOLS
 // ============================================================================
 
-type ListChannelsTool struct{ client *Client }
+type ListChannelsTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *ListChannelsTool) Name() string { return "list_channels" }
 func (t *ListChannelsTool) Description() string {
@@ -41,7 +44,10 @@ func (t *ListChannelsTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type GetChannelInfoTool struct{ client *Client }
+type GetChannelInfoTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *GetChannelInfoTool) Name() string { return "get_channel_info" }
 func (t *GetChannelInfoTool) Description() string {
@@ -67,7 +73,10 @@ func (t *GetChannelInfoTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type CreateChannelTool struct{ client *Client }
+type CreateChannelTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *CreateChannelTool) Name() string                { return "create_channel" }
 func (t *CreateChannelTool) Description() string         { return "Create a new Slack channel." }
@@ -93,7 +102,10 @@ func (t *CreateChannelTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type ArchiveChannelTool struct{ client *Client }
+type ArchiveChannelTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *ArchiveChannelTool) Name() string                { return "archive_channel" }
 func (t *ArchiveChannelTool) Description() string         { return "Archive a Slack channel." }
@@ -116,7 +128,10 @@ func (t *ArchiveChannelTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type GetChannelHistoryTool struct{ client *Client }
+type GetChannelHistoryTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *GetChannelHistoryTool) Name() string { return "get_channel_history" }
 func (t *GetChannelHistoryTool) Description() string {
@@ -145,7 +160,10 @@ func (t *GetChannelHistoryTool) GetEnforcerProfile() *framework.EnforcerProfile 
 	)
 }
 
-type JoinChannelTool struct{ client *Client }
+type JoinChannelTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *JoinChannelTool) Name() string                { return "join_channel" }
 func (t *JoinChannelTool) Description() string         { return "Join a Slack channel." }
@@ -169,7 +187,10 @@ func (t *JoinChannelTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type LeaveChannelTool struct{ client *Client }
+type LeaveChannelTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *LeaveChannelTool) Name() string                { return "leave_channel" }
 func (t *LeaveChannelTool) Description() string         { return "Leave a Slack channel." }
@@ -192,7 +213,10 @@ func (t *LeaveChannelTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type SetChannelTopicTool struct{ client *Client }
+type SetChannelTopicTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *SetChannelTopicTool) Name() string                { return "set_channel_topic" }
 func (t *SetChannelTopicTool) Description() string         { return "Set the topic for a Slack channel." }
@@ -221,7 +245,10 @@ func (t *SetChannelTopicTool) GetEnforcerProfile() *framework.EnforcerProfile {
 // MESSAGE TOOLS
 // ============================================================================
 
-type PostMessageTool struct{ client *Client }
+type PostMessageTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *PostMessageTool) Name() string                { return "post_message" }
 func (t *PostMessageTool) Description() string         { return "Post a message to a Slack channel." }
@@ -248,7 +275,10 @@ func (t *PostMessageTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type ReplyToThreadTool struct{ client *Client }
+type ReplyToThreadTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *ReplyToThreadTool) Name() string                { return "reply_to_thread" }
 func (t *ReplyToThreadTool) Description() string         { return "Reply to a message thread in Slack." }
@@ -274,7 +304,10 @@ func (t *ReplyToThreadTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type GetThreadRepliesTool struct{ client *Client }
+type GetThreadRepliesTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *GetThreadRepliesTool) Name() string                { return "get_thread_replies" }
 func (t *GetThreadRepliesTool) Description() string         { return "Get all replies in a message thread." }
@@ -300,7 +333,10 @@ func (t *GetThreadRepliesTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type AddReactionTool struct{ client *Client }
+type AddReactionTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *AddReactionTool) Name() string                { return "add_reaction" }
 func (t *AddReactionTool) Description() string         { return "Add an emoji reaction to a message." }
@@ -324,7 +360,10 @@ func (t *AddReactionTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type RemoveReactionTool struct{ client *Client }
+type RemoveReactionTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *RemoveReactionTool) Name() string                { return "remove_reaction" }
 func (t *RemoveReactionTool) Description() string         { return "Remove an emoji reaction from a message." }
@@ -348,7 +387,10 @@ func (t *RemoveReactionTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type GetMessageReactionsTool struct{ client *Client }
+type GetMessageReactionsTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *GetMessageReactionsTool) Name() string { return "get_message_reactions" }
 func (t *GetMessageReactionsTool) Description() string {
@@ -375,7 +417,10 @@ func (t *GetMessageReactionsTool) GetEnforcerProfile() *framework.EnforcerProfil
 	)
 }
 
-type UpdateMessageTool struct{ client *Client }
+type UpdateMessageTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *UpdateMessageTool) Name() string                { return "update_message" }
 func (t *UpdateMessageTool) Description() string         { return "Update an existing message." }
@@ -400,7 +445,10 @@ func (t *UpdateMessageTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type DeleteMessageTool struct{ client *Client }
+type DeleteMessageTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *DeleteMessageTool) Name() string                { return "delete_message" }
 func (t *DeleteMessageTool) Description() string         { return "Delete a message from a channel." }
@@ -425,7 +473,10 @@ func (t *DeleteMessageTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type SendDMTool struct{ client *Client }
+type SendDMTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *SendDMTool) Name() string                { return "send_dm" }
 func (t *SendDMTool) Description() string         { return "Send a direct message to a user." }
@@ -453,7 +504,10 @@ func (t *SendDMTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type ListConversationsTool struct{ client *Client }
+type ListConversationsTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *ListConversationsTool) Name() string { return "list_conversations" }
 func (t *ListConversationsTool) Description() string {
@@ -480,7 +534,10 @@ func (t *ListConversationsTool) GetEnforcerProfile() *framework.EnforcerProfile 
 	)
 }
 
-type GetDMHistoryTool struct{ client *Client }
+type GetDMHistoryTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *GetDMHistoryTool) Name() string { return "get_dm_history" }
 func (t *GetDMHistoryTool) Description() string {
@@ -509,7 +566,10 @@ func (t *GetDMHistoryTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type OpenDMTool struct{ client *Client }
+type OpenDMTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *OpenDMTool) Name() string                { return "open_dm" }
 func (t *OpenDMTool) Description() string         { return "Open a direct message or group DM conversation." }
@@ -537,7 +597,10 @@ func (t *OpenDMTool) GetEnforcerProfile() *framework.EnforcerProfile {
 // SEARCH TOOLS
 // ============================================================================
 
-type SearchMessagesTool struct{ client *Client }
+type SearchMessagesTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *SearchMessagesTool) Name() string { return "search_messages" }
 func (t *SearchMessagesTool) Description() string {
@@ -566,7 +629,10 @@ func (t *SearchMessagesTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type SearchFilesTool struct{ client *Client }
+type SearchFilesTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *SearchFilesTool) Name() string                { return "search_files" }
 func (t *SearchFilesTool) Description() string         { return "Search files across the Slack workspace." }
@@ -593,7 +659,10 @@ func (t *SearchFilesTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type SearchAllTool struct{ client *Client }
+type SearchAllTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *SearchAllTool) Name() string { return "search_all" }
 func (t *SearchAllTool) Description() string {
@@ -627,7 +696,10 @@ func (t *SearchAllTool) GetEnforcerProfile() *framework.EnforcerProfile {
 // USER TOOLS
 // ============================================================================
 
-type ListUsersTool struct{ client *Client }
+type ListUsersTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *ListUsersTool) Name() string                { return "list_users" }
 func (t *ListUsersTool) Description() string         { return "List all users in the Slack workspace." }
@@ -652,7 +724,10 @@ func (t *ListUsersTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type GetUserInfoTool struct{ client *Client }
+type GetUserInfoTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *GetUserInfoTool) Name() string { return "get_user_info" }
 func (t *GetUserInfoTool) Description() string {
