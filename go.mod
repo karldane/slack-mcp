@@ -1,9 +1,9 @@
 module github.com/karldane/slack-mcp
 
-go 1.25
+go 1.25.0
 
 require (
-	github.com/karldane/mcp-framework v0.1.0
+	github.com/karldane/mcp-framework v0.2.8
 	github.com/mark3labs/mcp-go v0.45.0
 	github.com/slack-go/slack v0.19.0
 )
@@ -14,6 +14,8 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/invopop/jsonschema v0.13.0 // indirect
+	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115 // indirect
+	github.com/karldane/go-presidio v0.0.2 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
@@ -22,5 +24,3 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/karldane/mcp-framework => /home/karld@tusk-watf.tuskerdirect.com/Nextcloud/Tusker/code/mcp/mcp-framework
