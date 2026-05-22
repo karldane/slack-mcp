@@ -15,7 +15,7 @@ func main() {
 
 	server := slack.NewServer()
 
-	if framework.HandleScanFlag(server) {
+	if framework.HandleScanFlag(server.Server) {
 		return
 	}
 

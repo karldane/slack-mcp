@@ -1,7 +1,6 @@
 package slack
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 
@@ -23,7 +22,7 @@ func (t *ListChannelsTool) Description() string {
 	return "List all accessible Slack channels in the workspace."
 }
 func (t *ListChannelsTool) Schema() mcp.ToolInputSchema { return listChannelsSchema() }
-func (t *ListChannelsTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *ListChannelsTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	types := getString(args, "types", "public_channel,private_channel")
 	excludeArchived := getBool(args, "exclude_archived", true)
 	limit := getInt(args, "limit", 100)
@@ -54,7 +53,7 @@ func (t *GetChannelInfoTool) Description() string {
 	return "Get detailed information about a specific Slack channel."
 }
 func (t *GetChannelInfoTool) Schema() mcp.ToolInputSchema { return getChannelInfoSchema() }
-func (t *GetChannelInfoTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *GetChannelInfoTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	ch, err := t.client.GetChannelInfo(ctx, channelID)
 	if err != nil {
@@ -81,7 +80,7 @@ type CreateChannelTool struct {
 func (t *CreateChannelTool) Name() string                { return "create_channel" }
 func (t *CreateChannelTool) Description() string         { return "Create a new Slack channel." }
 func (t *CreateChannelTool) Schema() mcp.ToolInputSchema { return createChannelSchema() }
-func (t *CreateChannelTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *CreateChannelTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	name := getRequiredString(args, "name")
 	isPrivate := getBool(args, "is_private", false)
 	ch, err := t.client.CreateChannel(ctx, name, isPrivate)
@@ -110,7 +109,7 @@ type ArchiveChannelTool struct {
 func (t *ArchiveChannelTool) Name() string                { return "archive_channel" }
 func (t *ArchiveChannelTool) Description() string         { return "Archive a Slack channel." }
 func (t *ArchiveChannelTool) Schema() mcp.ToolInputSchema { return archiveChannelSchema() }
-func (t *ArchiveChannelTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *ArchiveChannelTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	if err := t.client.ArchiveChannel(ctx, channelID); err != nil {
 		return framework.TextResult(""), err
@@ -138,7 +137,7 @@ func (t *GetChannelHistoryTool) Description() string {
 	return "Fetch message history from a Slack channel."
 }
 func (t *GetChannelHistoryTool) Schema() mcp.ToolInputSchema { return getChannelHistorySchema() }
-func (t *GetChannelHistoryTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *GetChannelHistoryTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	limit := getInt(args, "limit", 20)
 	oldest := getString(args, "oldest", "")
@@ -168,7 +167,7 @@ type JoinChannelTool struct {
 func (t *JoinChannelTool) Name() string                { return "join_channel" }
 func (t *JoinChannelTool) Description() string         { return "Join a Slack channel." }
 func (t *JoinChannelTool) Schema() mcp.ToolInputSchema { return joinChannelSchema() }
-func (t *JoinChannelTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *JoinChannelTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	ch, _, err := t.client.JoinChannel(ctx, channelID)
 	if err != nil {
@@ -195,7 +194,7 @@ type LeaveChannelTool struct {
 func (t *LeaveChannelTool) Name() string                { return "leave_channel" }
 func (t *LeaveChannelTool) Description() string         { return "Leave a Slack channel." }
 func (t *LeaveChannelTool) Schema() mcp.ToolInputSchema { return leaveChannelSchema() }
-func (t *LeaveChannelTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *LeaveChannelTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	ok, err := t.client.LeaveChannel(ctx, channelID)
 	if err != nil {
@@ -221,7 +220,7 @@ type SetChannelTopicTool struct {
 func (t *SetChannelTopicTool) Name() string                { return "set_channel_topic" }
 func (t *SetChannelTopicTool) Description() string         { return "Set the topic for a Slack channel." }
 func (t *SetChannelTopicTool) Schema() mcp.ToolInputSchema { return setChannelTopicSchema() }
-func (t *SetChannelTopicTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *SetChannelTopicTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	topic := getRequiredString(args, "topic")
 	ch, err := t.client.SetChannelTopic(ctx, channelID, topic)
@@ -253,7 +252,7 @@ type PostMessageTool struct {
 func (t *PostMessageTool) Name() string                { return "post_message" }
 func (t *PostMessageTool) Description() string         { return "Post a message to a Slack channel." }
 func (t *PostMessageTool) Schema() mcp.ToolInputSchema { return postMessageSchema() }
-func (t *PostMessageTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *PostMessageTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	text := getRequiredString(args, "text")
 	threadTS := getString(args, "thread_ts", "")
@@ -283,7 +282,7 @@ type ReplyToThreadTool struct {
 func (t *ReplyToThreadTool) Name() string                { return "reply_to_thread" }
 func (t *ReplyToThreadTool) Description() string         { return "Reply to a message thread in Slack." }
 func (t *ReplyToThreadTool) Schema() mcp.ToolInputSchema { return replyToThreadSchema() }
-func (t *ReplyToThreadTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *ReplyToThreadTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	threadTS := getRequiredString(args, "thread_ts")
 	text := getRequiredString(args, "text")
@@ -312,7 +311,7 @@ type GetThreadRepliesTool struct {
 func (t *GetThreadRepliesTool) Name() string                { return "get_thread_replies" }
 func (t *GetThreadRepliesTool) Description() string         { return "Get all replies in a message thread." }
 func (t *GetThreadRepliesTool) Schema() mcp.ToolInputSchema { return getThreadRepliesSchema() }
-func (t *GetThreadRepliesTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *GetThreadRepliesTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	threadTS := getRequiredString(args, "thread_ts")
 	limit := getInt(args, "limit", 20)
@@ -341,7 +340,7 @@ type AddReactionTool struct {
 func (t *AddReactionTool) Name() string                { return "add_reaction" }
 func (t *AddReactionTool) Description() string         { return "Add an emoji reaction to a message." }
 func (t *AddReactionTool) Schema() mcp.ToolInputSchema { return addReactionSchema() }
-func (t *AddReactionTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *AddReactionTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	timestamp := getRequiredString(args, "timestamp")
 	emoji := getRequiredString(args, "emoji")
@@ -368,7 +367,7 @@ type RemoveReactionTool struct {
 func (t *RemoveReactionTool) Name() string                { return "remove_reaction" }
 func (t *RemoveReactionTool) Description() string         { return "Remove an emoji reaction from a message." }
 func (t *RemoveReactionTool) Schema() mcp.ToolInputSchema { return removeReactionSchema() }
-func (t *RemoveReactionTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *RemoveReactionTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	timestamp := getRequiredString(args, "timestamp")
 	emoji := getRequiredString(args, "emoji")
@@ -397,7 +396,7 @@ func (t *GetMessageReactionsTool) Description() string {
 	return "Get all reactions on a specific message."
 }
 func (t *GetMessageReactionsTool) Schema() mcp.ToolInputSchema { return getMessageReactionsSchema() }
-func (t *GetMessageReactionsTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *GetMessageReactionsTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	timestamp := getRequiredString(args, "timestamp")
 	reactions, err := t.client.GetReactions(ctx, channelID, timestamp, true)
@@ -425,7 +424,7 @@ type UpdateMessageTool struct {
 func (t *UpdateMessageTool) Name() string                { return "update_message" }
 func (t *UpdateMessageTool) Description() string         { return "Update an existing message." }
 func (t *UpdateMessageTool) Schema() mcp.ToolInputSchema { return updateMessageSchema() }
-func (t *UpdateMessageTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *UpdateMessageTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	timestamp := getRequiredString(args, "timestamp")
 	text := getRequiredString(args, "text")
@@ -453,7 +452,7 @@ type DeleteMessageTool struct {
 func (t *DeleteMessageTool) Name() string                { return "delete_message" }
 func (t *DeleteMessageTool) Description() string         { return "Delete a message from a channel." }
 func (t *DeleteMessageTool) Schema() mcp.ToolInputSchema { return deleteMessageSchema() }
-func (t *DeleteMessageTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *DeleteMessageTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	timestamp := getRequiredString(args, "timestamp")
 	_, _, err := t.client.DeleteMessage(ctx, channelID, timestamp)
@@ -481,7 +480,7 @@ type SendDMTool struct {
 func (t *SendDMTool) Name() string                { return "send_dm" }
 func (t *SendDMTool) Description() string         { return "Send a direct message to a user." }
 func (t *SendDMTool) Schema() mcp.ToolInputSchema { return sendDMSchema() }
-func (t *SendDMTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *SendDMTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	userID := getRequiredString(args, "user_id")
 	text := getRequiredString(args, "text")
 	ch, _, _, err := t.client.OpenDM(ctx, []string{userID})
@@ -514,7 +513,7 @@ func (t *ListConversationsTool) Description() string {
 	return "List direct message and group DM conversations."
 }
 func (t *ListConversationsTool) Schema() mcp.ToolInputSchema { return listConversationsSchema() }
-func (t *ListConversationsTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *ListConversationsTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	types := getString(args, "types", "im,mpim")
 	limit := getInt(args, "limit", 50)
 	chans, _, err := t.client.ListConversations(ctx, types, limit)
@@ -544,7 +543,7 @@ func (t *GetDMHistoryTool) Description() string {
 	return "Fetch message history from a DM or group DM conversation."
 }
 func (t *GetDMHistoryTool) Schema() mcp.ToolInputSchema { return getDMHistorySchema() }
-func (t *GetDMHistoryTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *GetDMHistoryTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	channelID := getRequiredString(args, "channel_id")
 	limit := getInt(args, "limit", 20)
 	oldest := getString(args, "oldest", "")
@@ -574,7 +573,7 @@ type OpenDMTool struct {
 func (t *OpenDMTool) Name() string                { return "open_dm" }
 func (t *OpenDMTool) Description() string         { return "Open a direct message or group DM conversation." }
 func (t *OpenDMTool) Schema() mcp.ToolInputSchema { return openDMSchema() }
-func (t *OpenDMTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *OpenDMTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	userIDsStr := getRequiredString(args, "user_ids")
 	ch, _, _, err := t.client.OpenDM(ctx, []string{userIDsStr})
 	if err != nil {
@@ -607,7 +606,7 @@ func (t *SearchMessagesTool) Description() string {
 	return "Search messages across the Slack workspace."
 }
 func (t *SearchMessagesTool) Schema() mcp.ToolInputSchema { return searchMessagesSchema() }
-func (t *SearchMessagesTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *SearchMessagesTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	query := getRequiredString(args, "query")
 	sort := getString(args, "sort", "timestamp")
 	sortDir := getString(args, "sort_dir", "desc")
@@ -637,7 +636,7 @@ type SearchFilesTool struct {
 func (t *SearchFilesTool) Name() string                { return "search_files" }
 func (t *SearchFilesTool) Description() string         { return "Search files across the Slack workspace." }
 func (t *SearchFilesTool) Schema() mcp.ToolInputSchema { return searchFilesSchema() }
-func (t *SearchFilesTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *SearchFilesTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	query := getRequiredString(args, "query")
 	sort := getString(args, "sort", "timestamp")
 	sortDir := getString(args, "sort_dir", "desc")
@@ -669,7 +668,7 @@ func (t *SearchAllTool) Description() string {
 	return "Search both messages and files across the Slack workspace."
 }
 func (t *SearchAllTool) Schema() mcp.ToolInputSchema { return searchAllSchema() }
-func (t *SearchAllTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *SearchAllTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	query := getRequiredString(args, "query")
 	sort := getString(args, "sort", "timestamp")
 	sortDir := getString(args, "sort_dir", "desc")
@@ -704,7 +703,7 @@ type ListUsersTool struct {
 func (t *ListUsersTool) Name() string                { return "list_users" }
 func (t *ListUsersTool) Description() string         { return "List all users in the Slack workspace." }
 func (t *ListUsersTool) Schema() mcp.ToolInputSchema { return listUsersSchema() }
-func (t *ListUsersTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *ListUsersTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	limit := getInt(args, "limit", 100)
 	includeLocale := getBool(args, "include_locale", false)
 	users, err := t.client.ListUsers(ctx, limit, includeLocale)
@@ -734,7 +733,7 @@ func (t *GetUserInfoTool) Description() string {
 	return "Get detailed information about a specific user."
 }
 func (t *GetUserInfoTool) Schema() mcp.ToolInputSchema { return getUserInfoSchema() }
-func (t *GetUserInfoTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *GetUserInfoTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	userID := getRequiredString(args, "user_id")
 	user, err := t.client.GetUserInfo(ctx, userID)
 	if err != nil {
@@ -753,14 +752,17 @@ func (t *GetUserInfoTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type GetUserPresenceTool struct{ client *Client }
+type GetUserPresenceTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *GetUserPresenceTool) Name() string { return "get_user_presence" }
 func (t *GetUserPresenceTool) Description() string {
 	return "Get the presence/online status of a user."
 }
 func (t *GetUserPresenceTool) Schema() mcp.ToolInputSchema { return getUserPresenceSchema() }
-func (t *GetUserPresenceTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *GetUserPresenceTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	userID := getRequiredString(args, "user_id")
 	presence, err := t.client.GetUserPresence(ctx, userID)
 	if err != nil {
@@ -779,12 +781,15 @@ func (t *GetUserPresenceTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type LookupUserByEmailTool struct{ client *Client }
+type LookupUserByEmailTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *LookupUserByEmailTool) Name() string                { return "lookup_user_by_email" }
 func (t *LookupUserByEmailTool) Description() string         { return "Find a user by their email address." }
 func (t *LookupUserByEmailTool) Schema() mcp.ToolInputSchema { return lookupUserByEmailSchema() }
-func (t *LookupUserByEmailTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *LookupUserByEmailTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	email := getRequiredString(args, "email")
 	user, err := t.client.LookupUserByEmail(ctx, email)
 	if err != nil {
@@ -803,12 +808,15 @@ func (t *LookupUserByEmailTool) GetEnforcerProfile() *framework.EnforcerProfile 
 	)
 }
 
-type GetUserProfileTool struct{ client *Client }
+type GetUserProfileTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *GetUserProfileTool) Name() string                { return "get_user_profile" }
 func (t *GetUserProfileTool) Description() string         { return "Get the profile information for a user." }
 func (t *GetUserProfileTool) Schema() mcp.ToolInputSchema { return getUserProfileSchema() }
-func (t *GetUserProfileTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *GetUserProfileTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	userID := getRequiredString(args, "user_id")
 	profile, err := t.client.GetUserProfile(ctx, userID)
 	if err != nil {
@@ -827,14 +835,17 @@ func (t *GetUserProfileTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type GetBotInfoTool struct{ client *Client }
+type GetBotInfoTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *GetBotInfoTool) Name() string { return "get_bot_info" }
 func (t *GetBotInfoTool) Description() string {
 	return "Get information about the authenticated bot user."
 }
 func (t *GetBotInfoTool) Schema() mcp.ToolInputSchema { return getBotInfoSchema() }
-func (t *GetBotInfoTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *GetBotInfoTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	info, err := t.client.GetBotInfo(ctx)
 	if err != nil {
 		return framework.TextResult(""), err
@@ -852,14 +863,17 @@ func (t *GetBotInfoTool) GetEnforcerProfile() *framework.EnforcerProfile {
 	)
 }
 
-type GetTeamInfoTool struct{ client *Client }
+type GetTeamInfoTool struct {
+	framework.BaseTool
+	client *Client
+}
 
 func (t *GetTeamInfoTool) Name() string { return "get_team_info" }
 func (t *GetTeamInfoTool) Description() string {
 	return "Get information about the Slack workspace/team."
 }
 func (t *GetTeamInfoTool) Schema() mcp.ToolInputSchema { return getTeamInfoSchema() }
-func (t *GetTeamInfoTool) Handle(ctx context.Context, args map[string]interface{}) (framework.ToolResult, error) {
+func (t *GetTeamInfoTool) Handle(ctx framework.CallContext, args map[string]interface{}) (framework.ToolResult, error) {
 	info, err := t.client.GetTeamInfo(ctx)
 	if err != nil {
 		return framework.TextResult(""), err
